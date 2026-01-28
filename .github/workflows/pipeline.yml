@@ -1,0 +1,36 @@
+name: Continuous Deployment
+
+on:
+  pull_request:
+    branches:
+      - main
+    types: [opened, synchronize, reopened] # Solo se activa con el PR a main
+
+jobs:
+  # 1. Etapa de Desarrollo
+  deploy-dev:
+    runs-on: ubuntu-latest
+    environment: development # Aquí aprueba el Desarrollador
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Deploy to Dev
+        run: echo "Desplegando a Development tras aprobación del desarrollador..."
+
+  # 2. Etapa de QA
+  deploy-qa:
+    needs: deploy-dev # Espera a que termine Dev
+    runs-on: ubuntu-latest
+    environment: qa # Aquí aprueba el Líder de QA
+    steps:
+      - name: Deploy to QA
+        run: echo "Desplegando a QA tras aprobación del Líder QA..."
+
+  # 3. Etapa de Producción
+  deploy-prod:
+    needs: deploy-qa # Espera a que termine QA
+    runs-on: ubuntu-latest
+    environment: production # Aquí aprueba el de Operaciones/Prod
+    steps:
+      - name: Deploy to Production
+        run: echo "Desplegando a Producción tras aprobación final..."
